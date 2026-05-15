@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { google } from "googleapis";
-import { buildHumanSummary, type FormPayload } from "../src/lib/formExport";
+import { buildHumanSummary, type FormPayload } from "./lib/humanSummary.js";
 
 async function sendEmail(params: {
   apiKey: string;
