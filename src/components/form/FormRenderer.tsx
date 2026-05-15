@@ -16,8 +16,7 @@ const phoneRe = /^[+\d][\d\s().-]{6,}$/;
 const urlRe = /^(https?:\/\/)?[\w.-]+\.[a-z]{2,}(\/.*)?$/i;
 
 function validateQuestion(q: Question, v: AnswerValue): string | undefined {
-  const empty =
-    v == null || v === "" || (Array.isArray(v) && v.length === 0);
+  const empty = v == null || v === "" || (Array.isArray(v) && v.length === 0);
   if (q.required && empty) return "Este campo es obligatorio";
   if (empty) return undefined;
   if (q.type === "email" && typeof v === "string" && !emailRe.test(v.trim()))
@@ -40,7 +39,7 @@ export default function FormRenderer() {
 
   const totalQuestions = useMemo(
     () => formSections.reduce((acc, s) => acc + s.questions.length, 0),
-    []
+    [],
   );
   const filledCount = useMemo(() => {
     let n = 0;
@@ -142,7 +141,8 @@ export default function FormRenderer() {
               No hemos podido enviar el formulario.
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Tus respuestas no se han perdido. Puedes descargarlas o copiar el resumen e intentar de nuevo.
+              Tus respuestas no se han perdido. Puedes descargarlas o copiar el resumen e intentar
+              de nuevo.
             </p>
             <div className="mt-4 flex flex-wrap gap-3">
               <button
@@ -171,7 +171,8 @@ export default function FormRenderer() {
 
         <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs text-muted-foreground">
-            Al enviar, aceptas que reciba esta información para preparar una propuesta personalizada.
+            Al enviar, aceptas que reciba esta información para preparar una propuesta
+            personalizada.
           </p>
           <button
             type="submit"
@@ -188,18 +189,25 @@ export default function FormRenderer() {
 
 function SuccessScreen({ payload }: { payload: FormPayload }) {
   const wa = `https://wa.me/${WHATSAPP_NUMBER.replace(/\D/g, "")}?text=${encodeURIComponent(
-    `Hola, acabo de enviar el formulario (${payload.businessName || payload.contactName}).`
+    `Hola, acabo de enviar el formulario (${payload.businessName || payload.contactName}).`,
   )}`;
   return (
     <div id="success" className="mx-auto w-full max-w-2xl px-4 py-24 text-center">
       <div className="mx-auto mb-8 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
-        <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth="2">
+        <svg
+          viewBox="0 0 24 24"
+          className="h-7 w-7"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
           <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </div>
       <h1 className="text-3xl sm:text-4xl text-foreground">Gracias.</h1>
       <p className="mx-auto mt-4 max-w-prose text-base text-muted-foreground">
-        He recibido la información correctamente y podré revisar tu caso para proponerte una solución adecuada.
+        He recibido la información correctamente y podré revisar tu caso para proponerte una
+        solución adecuada.
       </p>
       <div className="mt-8 flex flex-wrap justify-center gap-3">
         <a

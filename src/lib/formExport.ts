@@ -41,7 +41,17 @@ function answerToString(v: AnswerValue): string {
 }
 
 export function buildCsv(payload: FormPayload): string {
-  const headers = ["seccion", "pregunta", "respuesta", "tipo", "fecha", "negocio", "responsable", "email", "telefono"];
+  const headers = [
+    "seccion",
+    "pregunta",
+    "respuesta",
+    "tipo",
+    "fecha",
+    "negocio",
+    "responsable",
+    "email",
+    "telefono",
+  ];
   const rows: string[][] = [headers];
   for (const section of formSections) {
     const sAnswers = payload.answers[section.id] ?? {};

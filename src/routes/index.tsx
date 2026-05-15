@@ -46,13 +46,12 @@ function Hero() {
         </div>
 
         <h1 className="mt-6 text-4xl leading-[1.1] text-foreground sm:text-6xl">
-          Cuéntame cómo{" "}
-          <span className="text-gradient-brand">funciona tu negocio</span>
+          Cuéntame cómo <span className="text-gradient-brand">funciona tu negocio</span>
         </h1>
 
         <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-          Este formulario me ayuda a entender cómo trabajas actualmente y qué herramientas
-          podrían ayudarte a organizar mejor clientes, pedidos, catálogos, citas y seguimiento.
+          Este formulario me ayuda a entender cómo trabajas actualmente y qué herramientas podrían
+          ayudarte a organizar mejor clientes, pedidos, catálogos, citas y seguimiento.
         </p>
 
         <div className="mt-10 flex flex-wrap items-center gap-4">

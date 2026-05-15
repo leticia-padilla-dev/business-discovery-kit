@@ -49,7 +49,15 @@ function TextLikeField({ question, value, onChange, error, type }: FieldProps & 
         value={(value as string) ?? ""}
         onChange={(e) => onChange(e.target.value)}
         inputMode={
-          type === "tel" ? "tel" : type === "email" ? "email" : type === "url" ? "url" : type === "number" ? "decimal" : undefined
+          type === "tel"
+            ? "tel"
+            : type === "email"
+              ? "email"
+              : type === "url"
+                ? "url"
+                : type === "number"
+                  ? "decimal"
+                  : undefined
         }
       />
     </FieldShell>
@@ -73,7 +81,7 @@ function TextareaField({ question, value, onChange, error }: FieldProps) {
 function SingleChoiceField({ question, value, onChange, error }: FieldProps) {
   const opts = question.options ?? [];
   const [other, setOther] = useState(
-    typeof value === "string" && !opts.includes(value) ? value : ""
+    typeof value === "string" && !opts.includes(value) ? value : "",
   );
   return (
     <FieldShell question={question} error={error}>
@@ -141,12 +149,20 @@ function MultipleChoiceField({ question, value, onChange, error }: FieldProps) {
               <span
                 className={
                   "flex h-5 w-5 shrink-0 items-center justify-center rounded-md border " +
-                  (active ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background")
+                  (active
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-background")
                 }
                 aria-hidden
               >
                 {active && (
-                  <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <svg
+                    viewBox="0 0 16 16"
+                    className="h-3.5 w-3.5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                  >
                     <path d="M3 8.5l3 3 7-7" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 )}

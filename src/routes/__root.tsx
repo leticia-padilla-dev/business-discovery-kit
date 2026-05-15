@@ -73,10 +73,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Cuéntame cómo funciona tu negocio" },
-      { name: "description", content: "Formulario de descubrimiento para entender cómo trabajas y proponerte una solución personalizada para clientes, pedidos, catálogos y citas." },
+      {
+        name: "description",
+        content:
+          "Formulario de descubrimiento para entender cómo trabajas y proponerte una solución personalizada para clientes, pedidos, catálogos y citas.",
+      },
       { name: "author", content: "Descubrimiento" },
       { property: "og:title", content: "Cuéntame cómo funciona tu negocio" },
-      { property: "og:description", content: "Formulario de descubrimiento para negocios de venta por catálogo, cosmética, distribución e intermediación." },
+      {
+        property: "og:description",
+        content:
+          "Formulario de descubrimiento para negocios de venta por catálogo, cosmética, distribución e intermediación.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
