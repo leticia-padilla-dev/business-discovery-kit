@@ -33,6 +33,19 @@ function FieldShell({
         {question.required && <span className="ml-1 text-primary">*</span>}
       </label>
       {question.helpText && <p className={helpCls}>{question.helpText}</p>}
+      {question.examples && question.examples.length > 0 && (
+        <div className="rounded-xl border border-border/50 bg-secondary/40 px-4 py-3">
+          <p className="mb-1.5 text-xs font-medium text-muted-foreground">Ejemplos:</p>
+          <ul className="flex flex-wrap gap-x-4 gap-y-1">
+            {question.examples.map((ex) => (
+              <li key={ex} className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <span className="h-1 w-1 shrink-0 rounded-full bg-primary/50" aria-hidden />
+                {ex}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       <div>{children}</div>
       {error && <p className={errorCls}>{error}</p>}
     </div>

@@ -18,6 +18,7 @@ export interface Question {
   required?: boolean;
   placeholder?: string;
   helpText?: string;
+  examples?: string[];
   options?: string[];
   allowOther?: boolean;
   min?: number;
@@ -117,7 +118,19 @@ export const formSections: FormSection[] = [
         type: "single-choice",
         options: ["Sí", "No", "Algunos"],
       },
-      { id: "share_catalogs", label: "¿Cómo compartes hoy los catálogos?", type: "textarea" },
+      {
+        id: "share_catalogs",
+        label: "¿Cómo compartes hoy los catálogos?",
+        type: "textarea",
+        examples: [
+          "WhatsApp",
+          "PDFs por correo",
+          "Instagram o Facebook",
+          "Fotos",
+          "Catálogo físico impreso",
+          "enlaces de compra",
+        ],
+      },
       {
         id: "brands_managed",
         label: "¿Qué marcas gestionas actualmente?",
@@ -140,8 +153,10 @@ export const formSections: FormSection[] = [
       {
         id: "catalog_frequency",
         label: "¿Cada cuánto cambian los catálogos?",
-        type: "single-choice",
-        options: ["Mensual", "Trimestral", "Por temporada", "Pocas veces al año"],
+        type: "multiple-choice",
+        helpText: "Puedes marcar varios si gestionas más de una marca.",
+        options: ["Semanal", "Quincenal", "Mensual", "Depende de la marca", "Campañas especiales"],
+        allowOther: true,
       },
       {
         id: "catalog_segmented",
@@ -207,6 +222,14 @@ export const formSections: FormSection[] = [
         id: "client_notes",
         label: "Cuéntame cualquier detalle importante sobre tus clientes",
         type: "textarea",
+        examples: [
+          "Compran siempre lo mismo",
+          "Hacen pedidos grandes",
+          "Responden lento por WhatsApp",
+          "Prefieren que les llamen",
+          "Necesitan recordatorios frecuentes",
+          "Son clientas recurrentes de años",
+        ],
       },
     ],
   },
@@ -232,11 +255,27 @@ export const formSections: FormSection[] = [
         id: "order_organization",
         label: "¿Cómo organizas actualmente los pedidos?",
         type: "textarea",
+        examples: [
+          "WhatsApp manual",
+          "Libreta o agenda",
+          "Excel",
+          "Notas del móvil",
+          "Mensajes fijados",
+          "Google Forms",
+        ],
       },
       {
         id: "order_problems",
         label: "¿Qué problemas tienes hoy con los pedidos?",
         type: "textarea",
+        examples: [
+          "Pedidos duplicados",
+          "Olvidos y errores",
+          "Mensajes perdidos entre chats",
+          "Errores de stock",
+          "Difícil hacer seguimiento",
+          "Clientes que no confirman",
+        ],
       },
       {
         id: "pending_payments",
@@ -287,6 +326,14 @@ export const formSections: FormSection[] = [
         id: "shared_links_type",
         label: "¿Qué tipo de direcciones o enlaces compartes?",
         type: "textarea",
+        examples: [
+          "Links de compra (Mary Kay, Beyond Beauty…)",
+          "Google Maps con tu ubicación",
+          "Catálogos en PDF o Drive",
+          "Formularios de pedido",
+          "WhatsApp directo",
+          "Perfil de Instagram",
+        ],
       },
       {
         id: "in_person_delivery",
@@ -345,8 +392,21 @@ export const formSections: FormSection[] = [
           "Llamada",
           "Videollamada",
         ],
+        allowOther: true,
       },
-      { id: "appointment_org", label: "¿Cómo organizas actualmente las citas?", type: "textarea" },
+      {
+        id: "appointment_org",
+        label: "¿Cómo organizas actualmente las citas?",
+        type: "textarea",
+        examples: [
+          "WhatsApp",
+          "Google Calendar",
+          "Libreta o agenda física",
+          "Notas del móvil",
+          "Llamadas directas",
+          "Mensajes privados de Instagram",
+        ],
+      },
       {
         id: "uses_gcal",
         label: "¿Usas Google Calendar?",
@@ -397,6 +457,7 @@ export const formSections: FormSection[] = [
           "Hacer seguimiento",
           "Agradecer compra",
         ],
+        allowOther: true,
       },
       {
         id: "sends_promos",
@@ -464,6 +525,7 @@ export const formSections: FormSection[] = [
           "Clientes que compran cada mes",
           "Clientes nuevos sin seguimiento",
         ],
+        allowOther: true,
       },
     ],
   },
@@ -512,6 +574,7 @@ export const formSections: FormSection[] = [
           "Tener una base de datos clara",
           "Preparar una web o catálogo digital",
         ],
+        allowOther: true,
       },
     ],
   },
