@@ -41,17 +41,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       })
     : new Date().toLocaleString("es-MX", { timeZone: "America/Tijuana" });
 
+  // Extract key operational columns from nested answers
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const ans = (typeof payload.answers === "object" && payload.answers ? payload.answers : {}) as Record<string, Record<string, any>>;
+  const pick = (section: string, key: string) => ans[section]?.[key] ?? "";
+  const joinArr = (v: unknown) =>
+    Array.isArray(v) ? v.filter(Boolean).join(", ") : String(v ?? "");
+
   const row = [
-    timestamp,
-    String(payload.contactName ?? ""),
-    String(payload.businessName ?? ""),
-    String(payload.email ?? payload.phone ?? ""),
-    JSON.stringify(payload),
+    timestamp,                                              // A
+    String(payload.contactName ?? ""),                     // B
+    String(payload.businessName ?? ""),                    // C
+    String(payload.email ?? payload.phone ?? ""),          // D
+    JSON.stringify(payload),                               // E — full payload preserved
+    String(pick("general", "city")),                       // F ciudad
+    joinArr(pick("products", "brands_managed")),           // G marcas
+    joinArr(pick("priorities", "main_priorities")),        // H prioridades
+    joinArr(pick("currentProblems", "first_improvement")), // I primer_dolor
+    String(pick("digitalLevel", "digital_comfort")),       // J nivel_digital
+    joinArr(pick("orders", "order_channel")),              // K canales_pedido
   ];
 
   await sheets.spreadsheets.values.append({
     spreadsheetId: sheetId,
-    range: "Sheet1!A:E",
+    range: "Sheet1!A:K",
     valueInputOption: "USER_ENTERED",
     requestBody: { values: [row] },
   });
