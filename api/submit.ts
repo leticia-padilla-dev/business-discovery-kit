@@ -41,25 +41,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       })
     : new Date().toLocaleString("es-MX", { timeZone: "America/Tijuana" });
 
-  // Extract key operational columns from nested answers
+  // Extract key operational columns from nested answers (F:K)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const ans = (typeof payload.answers === "object" && payload.answers ? payload.answers : {}) as Record<string, Record<string, any>>;
+  const ans = (
+    typeof payload.answers === "object" && payload.answers ? payload.answers : {}
+  ) as Record<string, Record<string, any>>;
   const pick = (section: string, key: string) => ans[section]?.[key] ?? "";
   const joinArr = (v: unknown) =>
     Array.isArray(v) ? v.filter(Boolean).join(", ") : String(v ?? "");
 
   const row = [
-    timestamp,                                              // A
-    String(payload.contactName ?? ""),                     // B
-    String(payload.businessName ?? ""),                    // C
-    String(payload.email ?? payload.phone ?? ""),          // D
-    JSON.stringify(payload),                               // E — full payload preserved
-    String(pick("general", "city")),                       // F ciudad
-    joinArr(pick("products", "brands_managed")),           // G marcas
-    joinArr(pick("priorities", "main_priorities")),        // H prioridades
-    joinArr(pick("currentProblems", "first_improvement")), // I primer_dolor
-    String(pick("digitalLevel", "digital_comfort")),       // J nivel_digital
-    joinArr(pick("orders", "order_channel")),              // K canales_pedido
+    timestamp,
+    String(payload.contactName ?? ""),
+    String(payload.businessName ?? ""),
+    String(payload.email ?? payload.phone ?? ""),
+    JSON.stringify(payload),
+    String(pick("general", "city")),
+    joinArr(pick("products", "brands_managed")),
+    joinArr(pick("priorities", "main_priorities")),
+    joinArr(pick("currentProblems", "first_improvement")),
+    String(pick("digitalLevel", "digital_comfort")),
+    joinArr(pick("orders", "order_channel")),
   ];
 
   await sheets.spreadsheets.values.append({
