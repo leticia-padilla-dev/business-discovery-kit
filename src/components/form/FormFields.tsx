@@ -137,7 +137,6 @@ function SingleChoiceField({ question, value, onChange, error }: FieldProps) {
         <div className="mt-3 space-y-1.5">
           <p className={helpCls}>{question.conditionalOtherLabel}</p>
           <input
-            // eslint-disable-next-line jsx-a11y/no-autofocus
             autoFocus
             className={baseInput}
             placeholder="Escribe aquí..."
@@ -232,7 +231,6 @@ function MultipleChoiceField({
         <div className="mt-3 space-y-1.5">
           <p className={helpCls}>{question.conditionalOtherLabel}</p>
           <input
-            // eslint-disable-next-line jsx-a11y/no-autofocus
             autoFocus
             className={baseInput}
             placeholder="Escribe aquí..."
