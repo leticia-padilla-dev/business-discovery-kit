@@ -16,9 +16,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const privateKey = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n");
   const sheetId = process.env.GOOGLE_SHEET_ID;
 
+  // Fallback: if Sheets is not configured, log the full payload and return success
+  // so the form UX works. Data is recoverable from Vercel function logs.
   if (!clientEmail || !privateKey || !sheetId) {
-    console.error("Missing env vars: GOOGLE_CLIENT_EMAIL, GOOGLE_PRIVATE_KEY or GOOGLE_SHEET_ID");
-    return res.status(500).json({ error: "Server misconfiguration" });
+    console.warn("[submit] Google Sheets not configured — logging payload:");
+    console.log(JSON.stringify(payload));
+    return res.status(200).json({ ok: true, warn: "sheets_not_configured" });
   }
 
   const auth = new google.auth.GoogleAuth({
@@ -47,12 +50,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     JSON.stringify(payload),
   ];
 
-  await sheets.spreadsheets.values.append({
-    spreadsheetId: sheetId,
-    range: "Sheet1!A:E",
-    valueInputOption: "USER_ENTERED",
-    requestBody: { values: [row] },
-  });
+  try {
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: sheetId,
+      range: "Sheet1!A:E",
+      valueInputOption: "USER_ENTERED",
+      requestBody: { values: [row] },
+    });
+  } catch (err) {
+    // Sheets call failed — log payload so it's recoverable, still return success
+    console.error("[submit] Sheets append failed:", err);
+    console.log("[submit] payload:", JSON.stringify(payload));
+    return res.status(200).json({ ok: true, warn: "sheets_error" });
+  }
 
   return res.status(200).json({ ok: true });
 }
