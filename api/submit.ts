@@ -1,7 +1,33 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { google } from "googleapis";
-import { Resend } from "resend";
 import { buildHumanSummary, type FormPayload } from "../src/lib/formExport";
+
+async function sendEmail(params: {
+  apiKey: string;
+  from: string;
+  to: string;
+  subject: string;
+  html?: string;
+  text?: string;
+}): Promise<void> {
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${params.apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: params.from,
+      to: params.to,
+      subject: params.subject,
+      ...(params.html ? { html: params.html } : { text: params.text }),
+    }),
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Resend API error ${res.status}: ${body}`);
+  }
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "POST") {
@@ -76,13 +102,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const fromEmail = process.env.FROM_EMAIL;
 
     if (resendKey && fromEmail) {
-      const resend = new Resend(resendKey);
       const summary = buildHumanSummary(payload as unknown as FormPayload);
       const recipientEmail = typeof payload.email === "string" ? payload.email.trim() : null;
       const internalEmail = process.env.INTERNAL_NOTIFICATION_EMAIL;
 
       if (recipientEmail) {
-        await resend.emails.send({
+        await sendEmail({
+          apiKey: resendKey,
           from: fromEmail,
           to: recipientEmail,
           subject: "Resumen de tu diagnóstico digital",
@@ -91,7 +117,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       if (internalEmail) {
-        await resend.emails.send({
+        await sendEmail({
+          apiKey: resendKey,
           from: fromEmail,
           to: internalEmail,
           subject: `Nuevo diagnóstico recibido — ${String(payload.businessName ?? "sin nombre")}`,
