@@ -120,23 +120,31 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const resendKey = process.env.RESEND_API_KEY?.trim();
   const fromEmail = process.env.FROM_EMAIL?.trim();
 
+  const emailDebug: Record<string, unknown> = {
+    hasResendKey: !!resendKey,
+    keyPrefix: resendKey ? resendKey.slice(0, 6) : null,
+    hasFromEmail: !!fromEmail,
+    fromEmail: fromEmail ?? null,
+  };
+
   if (resendKey && fromEmail) {
     let summary: { html: string; text: string } | null = null;
 
     try {
-      console.log("[submit] before buildHumanSummary");
       summary = buildHumanSummary(payload as unknown as FormPayload);
-      console.log("[submit] summary built");
+      emailDebug.summaryBuilt = true;
     } catch (e) {
-      console.error("[submit] summary build failed", e);
+      emailDebug.summaryBuilt = false;
+      emailDebug.summaryError = String(e);
     }
 
     const recipientEmail = typeof payload.email === "string" ? payload.email.trim() : null;
     const internalEmail = process.env.INTERNAL_NOTIFICATION_EMAIL?.trim();
+    emailDebug.recipientEmail = recipientEmail;
+    emailDebug.hasInternalEmail = !!internalEmail;
 
     if (summary && recipientEmail) {
       try {
-        console.log("[submit] before client email");
         await sendEmail({
           apiKey: resendKey,
           from: fromEmail,
@@ -144,15 +152,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           subject: "Resumen de tu diagnóstico digital",
           html: summary.html,
         });
-        console.log("[submit] client email ok");
+        emailDebug.clientEmailSent = true;
       } catch (e) {
-        console.error("[submit] client email failed", e);
+        emailDebug.clientEmailSent = false;
+        emailDebug.clientEmailError = String(e);
       }
+    } else {
+      emailDebug.clientEmailSkipped = !summary ? "no_summary" : "no_recipient";
     }
 
     if (summary && internalEmail) {
       try {
-        console.log("[submit] before internal email");
         await sendEmail({
           apiKey: resendKey,
           from: fromEmail,
@@ -160,13 +170,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           subject: `Nuevo diagnóstico recibido — ${String(payload.businessName ?? "sin nombre")}`,
           text: summary.text,
         });
-        console.log("[submit] internal email ok");
+        emailDebug.internalEmailSent = true;
       } catch (e) {
-        console.error("[submit] internal email failed", e);
+        emailDebug.internalEmailSent = false;
+        emailDebug.internalEmailError = String(e);
       }
+    } else {
+      emailDebug.internalEmailSkipped = !summary ? "no_summary" : "no_internal_address";
     }
+  } else {
+    emailDebug.skipped = "missing_resend_key_or_from_email";
   }
 
-  console.log("[submit] returning 200");
-  return res.status(200).json({ ok: true });
+  return res.status(200).json({ ok: true, emailDebug });
 }
