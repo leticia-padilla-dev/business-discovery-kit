@@ -115,12 +115,11 @@ export function buildSummaryText(payload: FormPayload): string {
   return lines.join("\n");
 }
 
-/**
- * Stub envío por email. Preparado para conectarse con Web3Forms, Resend,
- * EmailJS, Formspree, Make o Zapier (webhook). Por defecto resuelve true.
- */
-export async function sendFormByEmail(_payload: FormPayload): Promise<boolean> {
-  // TODO: integrar proveedor real. Ejemplo:
-  // await fetch("https://api.web3forms.com/submit", { method: "POST", ... })
-  return true;
+export async function sendFormByEmail(payload: FormPayload): Promise<boolean> {
+  const res = await fetch("/api/submit", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  return res.ok;
 }
