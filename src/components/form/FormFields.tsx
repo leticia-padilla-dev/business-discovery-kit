@@ -95,19 +95,32 @@ function TextareaField({ question, value, onChange, error }: FieldProps) {
 
 function SingleChoiceField({ question, value, onChange, error }: FieldProps) {
   const opts = question.options ?? [];
-  const [other, setOther] = useState(
-    typeof value === "string" && !opts.includes(value) ? value : "",
-  );
+  const hasConditionalOther = !!question.conditionalOtherLabel;
+  const existingCustom =
+    typeof value === "string" && value !== "Otra" && !opts.includes(value) ? value : "";
+  const [conditionalText, setConditionalText] = useState(existingCustom);
+  const otherActive = hasConditionalOther && (value === "Otra" || !!conditionalText);
   return (
     <FieldShell question={question} error={error}>
       <div className="grid gap-2 sm:grid-cols-2">
         {opts.map((opt) => {
-          const active = value === opt;
+          const active = hasConditionalOther && opt === "Otra" ? otherActive : value === opt;
           return (
             <button
               type="button"
               key={opt}
-              onClick={() => onChange(opt)}
+              onClick={() => {
+                if (hasConditionalOther && opt === "Otra") {
+                  if (otherActive) {
+                    setConditionalText("");
+                    onChange("");
+                  } else {
+                    onChange("Otra");
+                  }
+                } else {
+                  onChange(opt);
+                }
+              }}
               className={
                 "rounded-xl border px-4 py-3 text-left text-sm transition " +
                 (active
@@ -119,18 +132,23 @@ function SingleChoiceField({ question, value, onChange, error }: FieldProps) {
             </button>
           );
         })}
-        {question.allowOther && (
+      </div>
+      {hasConditionalOther && otherActive && (
+        <div className="mt-3 space-y-1.5">
+          <p className={helpCls}>{question.conditionalOtherLabel}</p>
           <input
-            className={baseInput + " sm:col-span-2"}
-            placeholder="Otra respuesta..."
-            value={other}
+            // eslint-disable-next-line jsx-a11y/no-autofocus
+            autoFocus
+            className={baseInput}
+            placeholder="Escribe aquí..."
+            value={conditionalText}
             onChange={(e) => {
-              setOther(e.target.value);
-              onChange(e.target.value);
+              setConditionalText(e.target.value);
+              onChange(e.target.value || "Otra");
             }}
           />
-        )}
-      </div>
+        </div>
+      )}
     </FieldShell>
   );
 }
@@ -145,17 +163,33 @@ function MultipleChoiceField({
 }: FieldProps) {
   const arr = Array.isArray(value) ? value : [];
   const opts = question.options ?? [];
+
+  // Entity questions: "Otra" chip reveals a text input
+  const hasConditionalOther = !!question.conditionalOtherLabel;
+  const existingCustom = arr.find((v) => v !== "Otra" && !opts.includes(v)) ?? "";
+  const [conditionalText, setConditionalText] = useState(existingCustom);
+  const otherChipActive = hasConditionalOther && (arr.includes("Otra") || !!conditionalText);
+
   const toggle = (opt: string) => {
-    if (arr.includes(opt)) onChange(arr.filter((v) => v !== opt));
-    else onChange([...arr, opt]);
+    if (hasConditionalOther && opt === "Otra") {
+      if (arr.includes("Otra") || conditionalText) {
+        setConditionalText("");
+        onChange(arr.filter((v) => v !== "Otra" && opts.includes(v)));
+      } else {
+        onChange([...arr.filter((v) => opts.includes(v)), "Otra"]);
+      }
+    } else {
+      if (arr.includes(opt)) onChange(arr.filter((v) => v !== opt));
+      else onChange([...arr, opt]);
+    }
   };
-  const otherSelected = arr.find((v) => !opts.includes(v));
-  const [other, setOther] = useState(otherSelected ?? "");
+
   return (
     <FieldShell question={question} error={error}>
       <div className="grid gap-2 sm:grid-cols-2">
         {opts.map((opt) => {
-          const active = arr.includes(opt);
+          const active =
+            hasConditionalOther && opt === "Otra" ? otherChipActive : arr.includes(opt);
           return (
             <button
               type="button"
@@ -193,20 +227,25 @@ function MultipleChoiceField({
             </button>
           );
         })}
-        {question.allowOther && (
+      </div>
+      {hasConditionalOther && otherChipActive && (
+        <div className="mt-3 space-y-1.5">
+          <p className={helpCls}>{question.conditionalOtherLabel}</p>
           <input
-            className={baseInput + " sm:col-span-2"}
-            placeholder="Otra respuesta..."
-            value={other}
+            // eslint-disable-next-line jsx-a11y/no-autofocus
+            autoFocus
+            className={baseInput}
+            placeholder="Escribe aquí..."
+            value={conditionalText}
             onChange={(e) => {
               const next = e.target.value;
-              setOther(next);
-              const filtered = arr.filter((v) => opts.includes(v));
-              onChange(next ? [...filtered, next] : filtered);
+              setConditionalText(next);
+              const filtered = arr.filter((v) => v !== "Otra" && opts.includes(v));
+              onChange(next ? [...filtered, next] : [...filtered, "Otra"]);
             }}
           />
-        )}
-      </div>
+        </div>
+      )}
       {question.noteLabel && onNoteChange && (
         <div className="mt-3 space-y-1.5">
           <p className={helpCls}>{question.noteLabel}</p>
