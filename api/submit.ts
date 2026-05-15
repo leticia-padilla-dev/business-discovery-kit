@@ -30,6 +30,8 @@ async function sendEmail(params: {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  console.log("[submit] request received");
+
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
@@ -39,6 +41,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!payload || typeof payload !== "object") {
     return res.status(400).json({ error: "Invalid payload" });
   }
+  console.log("[submit] payload validated");
 
   const clientEmail = process.env.GOOGLE_CLIENT_EMAIL;
   const privateKey = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n");
@@ -53,8 +56,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     credentials: { client_email: clientEmail, private_key: privateKey },
     scopes: ["https://www.googleapis.com/auth/spreadsheets"],
   });
+  console.log("[submit] auth created");
 
   const sheets = google.sheets({ version: "v4", auth });
+  console.log("[submit] sheets client created");
 
   const timestamp = payload.submittedAt
     ? new Date(payload.submittedAt as string).toLocaleString("es-MX", {
@@ -88,25 +93,45 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     String(pick("digitalLevel", "digital_comfort")),
     joinArr(pick("orders", "order_channel")),
   ];
+  console.log("[submit] row prepared", { rowLength: row.length });
 
-  await sheets.spreadsheets.values.append({
-    spreadsheetId: sheetId,
-    range: "Sheet1!A:K",
-    valueInputOption: "USER_ENTERED",
-    requestBody: { values: [row] },
-  });
-
-  // Email notifications — any failure here must not affect the 200 response
   try {
-    const resendKey = process.env.RESEND_API_KEY;
-    const fromEmail = process.env.FROM_EMAIL;
+    console.log("[submit] before sheets append");
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: sheetId,
+      range: "Sheet1!A:K",
+      valueInputOption: "USER_ENTERED",
+      requestBody: { values: [row] },
+    });
+    console.log("[submit] sheets append ok");
+  } catch (e) {
+    console.error("[submit] sheets append failed", e);
+    return res.status(500).json({
+      ok: false,
+      stage: "sheets_append",
+    });
+  }
 
-    if (resendKey && fromEmail) {
-      const summary = buildHumanSummary(payload as unknown as FormPayload);
-      const recipientEmail = typeof payload.email === "string" ? payload.email.trim() : null;
-      const internalEmail = process.env.INTERNAL_NOTIFICATION_EMAIL;
+  const resendKey = process.env.RESEND_API_KEY;
+  const fromEmail = process.env.FROM_EMAIL;
 
-      if (recipientEmail) {
+  if (resendKey && fromEmail) {
+    let summary: { html: string; text: string } | null = null;
+
+    try {
+      console.log("[submit] before buildHumanSummary");
+      summary = buildHumanSummary(payload as unknown as FormPayload);
+      console.log("[submit] summary built");
+    } catch (e) {
+      console.error("[submit] summary build failed", e);
+    }
+
+    const recipientEmail = typeof payload.email === "string" ? payload.email.trim() : null;
+    const internalEmail = process.env.INTERNAL_NOTIFICATION_EMAIL;
+
+    if (summary && recipientEmail) {
+      try {
+        console.log("[submit] before client email");
         await sendEmail({
           apiKey: resendKey,
           from: fromEmail,
@@ -114,9 +139,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           subject: "Resumen de tu diagnóstico digital",
           html: summary.html,
         });
+        console.log("[submit] client email ok");
+      } catch (e) {
+        console.error("[submit] client email failed", e);
       }
+    }
 
-      if (internalEmail) {
+    if (summary && internalEmail) {
+      try {
+        console.log("[submit] before internal email");
         await sendEmail({
           apiKey: resendKey,
           from: fromEmail,
@@ -124,11 +155,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           subject: `Nuevo diagnóstico recibido — ${String(payload.businessName ?? "sin nombre")}`,
           text: summary.text,
         });
+        console.log("[submit] internal email ok");
+      } catch (e) {
+        console.error("[submit] internal email failed", e);
       }
     }
-  } catch (e) {
-    console.error("Email notification failed (non-fatal):", e);
   }
 
+  console.log("[submit] returning 200");
   return res.status(200).json({ ok: true });
 }
