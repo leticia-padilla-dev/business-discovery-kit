@@ -7,6 +7,8 @@ interface FieldProps {
   value: AnswerValue;
   onChange: (v: AnswerValue) => void;
   error?: string;
+  noteValue?: string;
+  onNoteChange?: (v: string) => void;
 }
 
 const baseInput =
@@ -133,7 +135,14 @@ function SingleChoiceField({ question, value, onChange, error }: FieldProps) {
   );
 }
 
-function MultipleChoiceField({ question, value, onChange, error }: FieldProps) {
+function MultipleChoiceField({
+  question,
+  value,
+  onChange,
+  error,
+  noteValue,
+  onNoteChange,
+}: FieldProps) {
   const arr = Array.isArray(value) ? value : [];
   const opts = question.options ?? [];
   const toggle = (opt: string) => {
@@ -198,6 +207,18 @@ function MultipleChoiceField({ question, value, onChange, error }: FieldProps) {
           />
         )}
       </div>
+      {question.noteLabel && onNoteChange && (
+        <div className="mt-3 space-y-1.5">
+          <p className={helpCls}>{question.noteLabel}</p>
+          <textarea
+            rows={3}
+            className={baseInput + " resize-y text-sm leading-relaxed"}
+            placeholder="Escribe aquí si quieres añadir algo más..."
+            value={noteValue ?? ""}
+            onChange={(e) => onNoteChange(e.target.value)}
+          />
+        </div>
+      )}
     </FieldShell>
   );
 }
