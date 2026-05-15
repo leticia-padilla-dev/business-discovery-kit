@@ -209,10 +209,7 @@ export function buildHumanSummary(payload: FormPayload): HumanSummary {
   if (appts.auto_reminders === "Sí") wantsAuto.push("Avisos de cita");
 
   const firstName = escapeHtml(payload.contactName.split(" ")[0] || payload.contactName);
-  const businessLine = [payload.businessName, payload.city]
-    .filter(Boolean)
-    .map(escapeHtml)
-    .join(" · ");
+  const businessLine = [payload.businessName, payload.city].filter(Boolean).join(" · ");
 
   // ── HTML (client email) ──────────────────────────────────────────────────
   const html = `<!DOCTYPE html>
