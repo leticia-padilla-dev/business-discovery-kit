@@ -41,17 +41,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       })
     : new Date().toLocaleString("es-MX", { timeZone: "America/Tijuana" });
 
+  // Extract key operational columns from nested answers (F:K)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const ans = (
+    typeof payload.answers === "object" && payload.answers ? payload.answers : {}
+  ) as Record<string, Record<string, any>>;
+  const pick = (section: string, key: string) => ans[section]?.[key] ?? "";
+  const joinArr = (v: unknown) =>
+    Array.isArray(v) ? v.filter(Boolean).join(", ") : String(v ?? "");
+
   const row = [
     timestamp,
     String(payload.contactName ?? ""),
     String(payload.businessName ?? ""),
     String(payload.email ?? payload.phone ?? ""),
     JSON.stringify(payload),
+    String(pick("general", "city")),
+    joinArr(pick("products", "brands_managed")),
+    joinArr(pick("priorities", "main_priorities")),
+    joinArr(pick("currentProblems", "first_improvement")),
+    String(pick("digitalLevel", "digital_comfort")),
+    joinArr(pick("orders", "order_channel")),
   ];
 
   await sheets.spreadsheets.values.append({
     spreadsheetId: sheetId,
-    range: "Sheet1!A:E",
+    range: "Sheet1!A:K",
     valueInputOption: "USER_ENTERED",
     requestBody: { values: [row] },
   });
