@@ -30,10 +30,12 @@ function Hero() {
         <div className="absolute top-20 -right-20 h-[320px] w-[320px] rounded-full bg-[hsl(265_68%_65%/0.08)] blur-3xl" />
       </div>
 
-      <div className="mx-auto max-w-3xl px-4 pb-16 pt-24 sm:pt-32">
+      <div className="mx-auto max-w-3xl px-4 pb-10 pt-16 sm:pt-24">
         {/* Logo + brand */}
         <div className="mb-8 flex items-center gap-2.5">
-          <img src={logoMark} alt="Claridad Digital" className="h-7 w-7" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-card">
+            <img src={logoMark} alt="" aria-hidden className="h-5 w-5 object-contain" />
+          </div>
           <span className="text-sm font-medium tracking-wide text-muted-foreground">
             Claridad Digital
           </span>

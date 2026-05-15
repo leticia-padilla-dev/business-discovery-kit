@@ -10,7 +10,7 @@ interface FieldProps {
 }
 
 const baseInput =
-  "w-full rounded-xl border border-border bg-background px-4 py-3 text-base text-foreground placeholder:text-muted-foreground/70 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20";
+  "w-full rounded-xl border border-border bg-input px-4 py-3 text-base text-foreground placeholder:text-muted-foreground/50 outline-none transition focus:border-primary/70 focus:ring-2 focus:ring-primary/15";
 
 const labelCls = "block text-sm font-medium text-foreground";
 const helpCls = "text-xs text-muted-foreground";
@@ -96,8 +96,8 @@ function SingleChoiceField({ question, value, onChange, error }: FieldProps) {
               className={
                 "rounded-xl border px-4 py-3 text-left text-sm transition " +
                 (active
-                  ? "border-primary bg-primary/10 text-foreground"
-                  : "border-border bg-card hover:border-primary/40")
+                  ? "border-primary bg-primary/15 text-foreground"
+                  : "border-border bg-input hover:border-primary/50 hover:bg-input/80")
               }
             >
               {opt}
@@ -142,8 +142,8 @@ function MultipleChoiceField({ question, value, onChange, error }: FieldProps) {
               className={
                 "flex items-center gap-3 rounded-xl border px-4 py-3 text-left text-sm transition " +
                 (active
-                  ? "border-primary bg-primary/10 text-foreground"
-                  : "border-border bg-card hover:border-primary/40")
+                  ? "border-primary bg-primary/15 text-foreground"
+                  : "border-border bg-input hover:border-primary/50 hover:bg-input/80")
               }
             >
               <span
@@ -151,7 +151,7 @@ function MultipleChoiceField({ question, value, onChange, error }: FieldProps) {
                   "flex h-5 w-5 shrink-0 items-center justify-center rounded-md border " +
                   (active
                     ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border bg-background")
+                    : "border-border bg-input")
                 }
                 aria-hidden
               >
