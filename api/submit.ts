@@ -10,10 +10,15 @@ async function sendEmail(params: {
   html?: string;
   text?: string;
 }): Promise<void> {
+  const apiKey = params.apiKey.trim();
+  if (!apiKey.startsWith("re_") || /[\r\n]/.test(apiKey)) {
+    throw new Error("Invalid RESEND_API_KEY format");
+  }
+
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${params.apiKey}`,
+      Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -112,8 +117,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
   }
 
-  const resendKey = process.env.RESEND_API_KEY;
-  const fromEmail = process.env.FROM_EMAIL;
+  const resendKey = process.env.RESEND_API_KEY?.trim();
+  const fromEmail = process.env.FROM_EMAIL?.trim();
 
   if (resendKey && fromEmail) {
     let summary: { html: string; text: string } | null = null;
@@ -127,7 +132,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const recipientEmail = typeof payload.email === "string" ? payload.email.trim() : null;
-    const internalEmail = process.env.INTERNAL_NOTIFICATION_EMAIL;
+    const internalEmail = process.env.INTERNAL_NOTIFICATION_EMAIL?.trim();
 
     if (summary && recipientEmail) {
       try {
