@@ -188,7 +188,7 @@ export const formSections: FormSection[] = [
         id: "clients_storage",
         label: "¿Dónde guardas actualmente la información de tus clientes?",
         type: "single-choice",
-        options: ["WhatsApp", "Excel", "Agenda", "Notion", "No lo tengo organizado"],
+        options: ["WhatsApp", "Excel", "Agenda", "Notion", "No lo tengo organizado", "Otra"],
         conditionalOtherLabel: "¿Cuál?",
       },
       {
