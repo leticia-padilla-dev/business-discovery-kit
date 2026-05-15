@@ -12,8 +12,8 @@ export default defineConfig({
   tanstackStart: {
     server: {
       entry: "server",
-      // Use static preset on Vercel — the form has no server-side logic
-      ...(process.env.VERCEL ? { preset: "static" } : {}),
+      // Use Vercel preset so TanStack Start generates .vercel/output/ directly
+      ...(process.env.VERCEL ? { preset: "vercel" } : {}),
     },
   },
 });
