@@ -25,6 +25,10 @@ function validateQuestion(q: Question, v: AnswerValue): string | undefined {
     return "Introduce un teléfono válido";
   if (q.type === "url" && typeof v === "string" && !urlRe.test(v.trim()))
     return "Introduce una URL válida";
+  if (q.conditionalOtherLabel) {
+    const hasBarOtra = Array.isArray(v) ? v.includes("Otra") : v === "Otra";
+    if (hasBarOtra) return "Especifica qué otra opción antes de continuar";
+  }
   return undefined;
 }
 
