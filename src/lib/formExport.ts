@@ -191,8 +191,7 @@ export function buildHumanSummary(payload: FormPayload): HumanSummary {
   const stopManual = toArr(problems.stop_manual);
   const tools = toArr(digital.tools_used);
   const activeClients = toStr(clients.active_clients);
-  const digitalLevel =
-    typeof digital.digital_comfort === "number" ? digital.digital_comfort : null;
+  const digitalLevel = typeof digital.digital_comfort === "number" ? digital.digital_comfort : null;
 
   const wantsAuto: string[] = [];
   if (wa.wants_auto_reminders === "Sí") wantsAuto.push("Recordatorios automáticos");
