@@ -130,6 +130,16 @@ export default function FormRenderer() {
                 value={answers[section.id]?.[q.id]}
                 onChange={(v) => setAnswer(section.id, q.id, v)}
                 error={errors[section.id]?.[q.id]}
+                noteValue={
+                  q.noteLabel !== undefined
+                    ? ((answers[section.id]?.[q.id + "_note"] as string) ?? "")
+                    : undefined
+                }
+                onNoteChange={
+                  q.noteLabel !== undefined
+                    ? (v) => setAnswer(section.id, q.id + "_note", v)
+                    : undefined
+                }
               />
             ))}
           </SectionCard>

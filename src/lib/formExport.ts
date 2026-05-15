@@ -67,6 +67,20 @@ export function buildCsv(payload: FormPayload): string {
         payload.email,
         payload.phone,
       ]);
+      const note = sAnswers[q.id + "_note"];
+      if (note != null && String(note).trim()) {
+        rows.push([
+          section.title,
+          q.label + " — nota",
+          String(note).trim(),
+          "textarea",
+          payload.submittedAt,
+          payload.businessName,
+          payload.contactName,
+          payload.email,
+          payload.phone,
+        ]);
+      }
     }
   }
   return rows.map((r) => r.map((c) => csvEscape(c ?? "")).join(",")).join("\n");
@@ -109,6 +123,10 @@ export function buildSummaryText(payload: FormPayload): string {
       const v = sAnswers[q.id];
       if (v == null || (Array.isArray(v) && v.length === 0) || v === "") continue;
       lines.push(`• ${q.label}\n  ${answerToString(v)}`);
+      const note = sAnswers[q.id + "_note"];
+      if (note != null && String(note).trim()) {
+        lines.push(`  ↳ ${String(note).trim()}`);
+      }
     }
     lines.push("");
   }

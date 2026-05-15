@@ -19,6 +19,7 @@ export interface Question {
   placeholder?: string;
   helpText?: string;
   examples?: string[];
+  noteLabel?: string;
   options?: string[];
   allowOther?: boolean;
   min?: number;
@@ -121,15 +122,18 @@ export const formSections: FormSection[] = [
       {
         id: "share_catalogs",
         label: "¿Cómo compartes hoy los catálogos?",
-        type: "textarea",
-        examples: [
+        type: "multiple-choice",
+        options: [
           "WhatsApp",
           "PDFs por correo",
-          "Instagram o Facebook",
+          "Instagram",
+          "Facebook",
           "Fotos",
-          "Catálogo físico impreso",
-          "enlaces de compra",
+          "Catálogo físico",
+          "Enlaces de compra",
         ],
+        allowOther: true,
+        noteLabel: "Añade más contexto (opcional)",
       },
       {
         id: "brands_managed",
@@ -221,8 +225,8 @@ export const formSections: FormSection[] = [
       {
         id: "client_notes",
         label: "Cuéntame cualquier detalle importante sobre tus clientes",
-        type: "textarea",
-        examples: [
+        type: "multiple-choice",
+        options: [
           "Compran siempre lo mismo",
           "Hacen pedidos grandes",
           "Responden lento por WhatsApp",
@@ -230,6 +234,8 @@ export const formSections: FormSection[] = [
           "Necesitan recordatorios frecuentes",
           "Son clientas recurrentes de años",
         ],
+        allowOther: true,
+        noteLabel: "Añade más detalles (opcional)",
       },
     ],
   },
@@ -254,8 +260,8 @@ export const formSections: FormSection[] = [
       {
         id: "order_organization",
         label: "¿Cómo organizas actualmente los pedidos?",
-        type: "textarea",
-        examples: [
+        type: "multiple-choice",
+        options: [
           "WhatsApp manual",
           "Libreta o agenda",
           "Excel",
@@ -263,19 +269,23 @@ export const formSections: FormSection[] = [
           "Mensajes fijados",
           "Google Forms",
         ],
+        allowOther: true,
+        noteLabel: "Añade más contexto (opcional)",
       },
       {
         id: "order_problems",
         label: "¿Qué problemas tienes hoy con los pedidos?",
-        type: "textarea",
-        examples: [
+        type: "multiple-choice",
+        options: [
+          "Mensajes perdidos",
           "Pedidos duplicados",
-          "Olvidos y errores",
-          "Mensajes perdidos entre chats",
           "Errores de stock",
-          "Difícil hacer seguimiento",
-          "Clientes que no confirman",
+          "Seguimiento difícil",
+          "Clientes que no responden",
+          "Mucho trabajo manual",
         ],
+        allowOther: true,
+        noteLabel: "Añade más contexto (opcional)",
       },
       {
         id: "pending_payments",
@@ -325,15 +335,17 @@ export const formSections: FormSection[] = [
       {
         id: "shared_links_type",
         label: "¿Qué tipo de direcciones o enlaces compartes?",
-        type: "textarea",
-        examples: [
-          "Links de compra (Mary Kay, Beyond Beauty…)",
-          "Google Maps con tu ubicación",
-          "Catálogos en PDF o Drive",
-          "Formularios de pedido",
-          "WhatsApp directo",
-          "Perfil de Instagram",
+        type: "multiple-choice",
+        options: [
+          "Links de compra",
+          "Google Maps",
+          "WhatsApp",
+          "Instagram",
+          "Catálogos PDF",
+          "Formularios",
         ],
+        allowOther: true,
+        noteLabel: "Añade más contexto (opcional)",
       },
       {
         id: "in_person_delivery",
@@ -397,15 +409,17 @@ export const formSections: FormSection[] = [
       {
         id: "appointment_org",
         label: "¿Cómo organizas actualmente las citas?",
-        type: "textarea",
-        examples: [
+        type: "multiple-choice",
+        options: [
           "WhatsApp",
           "Google Calendar",
-          "Libreta o agenda física",
+          "Llamadas",
+          "Libreta",
           "Notas del móvil",
-          "Llamadas directas",
-          "Mensajes privados de Instagram",
+          "Instagram / Facebook",
         ],
+        allowOther: true,
+        noteLabel: "Añade más contexto (opcional)",
       },
       {
         id: "uses_gcal",
