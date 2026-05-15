@@ -153,12 +153,21 @@ function toStr(v: AnswerValue): string {
   return String(v).trim();
 }
 
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
 function chips(items: string[]): string {
   if (!items.length) return "";
   return items
     .map(
       (i) =>
-        `<span style="display:inline-block;background:#f3f4f6;border-radius:6px;padding:3px 10px;margin:2px 4px 2px 0;font-size:13px;color:#374151;">${i}</span>`,
+        `<span style="display:inline-block;background:#f3f4f6;border-radius:6px;padding:3px 10px;margin:2px 4px 2px 0;font-size:13px;color:#374151;">${escapeHtml(i)}</span>`,
     )
     .join("");
 }
@@ -199,8 +208,11 @@ export function buildHumanSummary(payload: FormPayload): HumanSummary {
   if (wa.wants_templates === "Sí") wantsAuto.push("Plantillas de mensaje");
   if (appts.auto_reminders === "Sí") wantsAuto.push("Avisos de cita");
 
-  const firstName = payload.contactName.split(" ")[0] || payload.contactName;
-  const businessLine = [payload.businessName, payload.city].filter(Boolean).join(" · ");
+  const firstName = escapeHtml(payload.contactName.split(" ")[0] || payload.contactName);
+  const businessLine = [payload.businessName, payload.city]
+    .filter(Boolean)
+    .map(escapeHtml)
+    .join(" · ");
 
   // ── HTML (client email) ──────────────────────────────────────────────────
   const html = `<!DOCTYPE html>
@@ -240,7 +252,7 @@ export function buildHumanSummary(payload: FormPayload): HumanSummary {
           ${summaryRow("Qué quieres mejorar primero", firstImprovement)}
           ${summaryRow("Qué te gustaría automatizar", stopManual.length ? stopManual : wantsAuto)}
           ${tools.length ? summaryRow("Herramientas que ya usas", tools) : ""}
-          ${activeClients ? `<tr><td style="padding:0 0 18px;"><p style="margin:0 0 6px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:#6b7280;">Clientes activos (aprox.)</p><p style="margin:0;font-size:15px;color:#374151;font-weight:600;">${activeClients}</p></td></tr>` : ""}
+          ${activeClients ? `<tr><td style="padding:0 0 18px;"><p style="margin:0 0 6px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:#6b7280;">Clientes activos (aprox.)</p><p style="margin:0;font-size:15px;color:#374151;font-weight:600;">${escapeHtml(activeClients)}</p></td></tr>` : ""}
           ${digitalLevel !== null ? `<tr><td style="padding:0;"><p style="margin:0 0 6px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:#6b7280;">Comodidad digital</p><p style="margin:0;font-size:15px;color:#374151;font-weight:600;">${digitalLevel} / 5</p></td></tr>` : ""}
         </table>
       </td></tr>
