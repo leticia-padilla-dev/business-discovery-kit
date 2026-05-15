@@ -61,18 +61,36 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const fromEmail = process.env.FROM_EMAIL;
   const recipientEmail = typeof payload.email === "string" ? payload.email.trim() : null;
 
+  const summary = buildHumanSummary(payload as unknown as FormPayload);
+
   if (resendKey && fromEmail && recipientEmail) {
     try {
       const resend = new Resend(resendKey);
-      const { html } = buildHumanSummary(payload as unknown as FormPayload);
       await resend.emails.send({
         from: fromEmail,
         to: recipientEmail,
         subject: "Resumen de tu diagnóstico digital",
-        html,
+        html: summary.html,
       });
     } catch (e) {
       console.error("Email send failed (non-fatal):", e);
+    }
+  }
+
+  // Send internal lead notification — failure must not break the response
+  const internalEmail = process.env.INTERNAL_NOTIFICATION_EMAIL;
+
+  if (resendKey && fromEmail && internalEmail) {
+    try {
+      const resend = new Resend(resendKey);
+      await resend.emails.send({
+        from: fromEmail,
+        to: internalEmail,
+        subject: `Nuevo diagnóstico recibido — ${String(payload.businessName ?? "sin nombre")}`,
+        text: summary.text,
+      });
+    } catch (e) {
+      console.error("Internal notification failed (non-fatal):", e);
     }
   }
 
