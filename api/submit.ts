@@ -42,10 +42,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     : new Date().toLocaleString("es-MX", { timeZone: "America/Tijuana" });
 
   // Extract key operational columns from nested answers (F:K)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const ans = (
     typeof payload.answers === "object" && payload.answers ? payload.answers : {}
-  ) as Record<string, Record<string, any>>;
+  ) as Record<string, Record<string, unknown>>;
   const pick = (section: string, key: string) => ans[section]?.[key] ?? "";
   const joinArr = (v: unknown) =>
     Array.isArray(v) ? v.filter(Boolean).join(", ") : String(v ?? "");
@@ -71,42 +70,37 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     requestBody: { values: [row] },
   });
 
-  // Send confirmation email — failure must not break the Sheets save
-  const resendKey = process.env.RESEND_API_KEY;
-  const fromEmail = process.env.FROM_EMAIL;
-  const recipientEmail = typeof payload.email === "string" ? payload.email.trim() : null;
+  // Email notifications — any failure here must not affect the 200 response
+  try {
+    const resendKey = process.env.RESEND_API_KEY;
+    const fromEmail = process.env.FROM_EMAIL;
 
-  const summary = buildHumanSummary(payload as unknown as FormPayload);
-
-  if (resendKey && fromEmail && recipientEmail) {
-    try {
+    if (resendKey && fromEmail) {
       const resend = new Resend(resendKey);
-      await resend.emails.send({
-        from: fromEmail,
-        to: recipientEmail,
-        subject: "Resumen de tu diagnóstico digital",
-        html: summary.html,
-      });
-    } catch (e) {
-      console.error("Email send failed (non-fatal):", e);
-    }
-  }
+      const summary = buildHumanSummary(payload as unknown as FormPayload);
+      const recipientEmail = typeof payload.email === "string" ? payload.email.trim() : null;
+      const internalEmail = process.env.INTERNAL_NOTIFICATION_EMAIL;
 
-  // Send internal lead notification — failure must not break the response
-  const internalEmail = process.env.INTERNAL_NOTIFICATION_EMAIL;
+      if (recipientEmail) {
+        await resend.emails.send({
+          from: fromEmail,
+          to: recipientEmail,
+          subject: "Resumen de tu diagnóstico digital",
+          html: summary.html,
+        });
+      }
 
-  if (resendKey && fromEmail && internalEmail) {
-    try {
-      const resend = new Resend(resendKey);
-      await resend.emails.send({
-        from: fromEmail,
-        to: internalEmail,
-        subject: `Nuevo diagnóstico recibido — ${String(payload.businessName ?? "sin nombre")}`,
-        text: summary.text,
-      });
-    } catch (e) {
-      console.error("Internal notification failed (non-fatal):", e);
+      if (internalEmail) {
+        await resend.emails.send({
+          from: fromEmail,
+          to: internalEmail,
+          subject: `Nuevo diagnóstico recibido — ${String(payload.businessName ?? "sin nombre")}`,
+          text: summary.text,
+        });
+      }
     }
+  } catch (e) {
+    console.error("Email notification failed (non-fatal):", e);
   }
 
   return res.status(200).json({ ok: true });
