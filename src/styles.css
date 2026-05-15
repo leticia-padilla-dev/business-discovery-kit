@@ -68,8 +68,8 @@
   --destructive: hsl(0 68% 55%);
   --destructive-foreground: hsl(0 0% 100%);
 
-  --border: hsl(235 28% 17%);
-  --input: hsl(235 30% 15%);
+  --border: hsl(235 24% 24%);
+  --input: hsl(235 28% 19%);
   --ring: hsl(255 76% 72%);
 
   /* Brand glow for decorative elements */
@@ -95,7 +95,9 @@
     text-rendering: optimizeLegibility;
   }
 
-  h1, h2, h3 {
+  h1,
+  h2,
+  h3 {
     font-family: var(--font-serif);
     letter-spacing: -0.02em;
   }
@@ -117,7 +119,7 @@
   .bg-mesh {
     background-image:
       radial-gradient(ellipse at 20% 30%, hsl(255 76% 72% / 0.12) 0%, transparent 60%),
-      radial-gradient(ellipse at 80% 70%, hsl(265 68% 65% / 0.10) 0%, transparent 55%);
+      radial-gradient(ellipse at 80% 70%, hsl(265 68% 65% / 0.1) 0%, transparent 55%);
   }
 
   .glass {

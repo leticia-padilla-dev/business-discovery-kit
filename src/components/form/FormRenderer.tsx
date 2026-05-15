@@ -112,7 +112,7 @@ export default function FormRenderer() {
           <span>Progreso</span>
           <span>{progress}%</span>
         </div>
-        <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-secondary">
+        <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-foreground/10">
           <div
             className="h-full rounded-full bg-primary transition-all duration-500"
             style={{ width: `${progress}%` }}
