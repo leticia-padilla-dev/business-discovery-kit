@@ -1,5 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { google } from "googleapis";
+import { Resend } from "resend";
+import { buildHumanSummary, type FormPayload } from "../src/lib/formExport";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "POST") {
@@ -53,6 +55,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     valueInputOption: "USER_ENTERED",
     requestBody: { values: [row] },
   });
+
+  // Send confirmation email — failure must not break the Sheets save
+  const resendKey = process.env.RESEND_API_KEY;
+  const fromEmail = process.env.FROM_EMAIL;
+  const recipientEmail = typeof payload.email === "string" ? payload.email.trim() : null;
+
+  if (resendKey && fromEmail && recipientEmail) {
+    try {
+      const resend = new Resend(resendKey);
+      const { html } = buildHumanSummary(payload as unknown as FormPayload);
+      await resend.emails.send({
+        from: fromEmail,
+        to: recipientEmail,
+        subject: "Resumen de tu diagnóstico digital",
+        html,
+      });
+    } catch (e) {
+      console.error("Email send failed (non-fatal):", e);
+    }
+  }
 
   return res.status(200).json({ ok: true });
 }
